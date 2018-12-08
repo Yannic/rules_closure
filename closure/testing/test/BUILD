@@ -79,6 +79,7 @@ closure_js_test(
         ":arithmetic_es6module_lib",
         "//closure/library:testing",
     ],
+    entry_points = ["/closure/testing/test/arithmetic_es6module_test"],
 )
 
 genrule(

@@ -18,6 +18,7 @@ package com.google.javascript.jscomp;
 
 import com.google.common.collect.ImmutableList;
 import com.google.javascript.jscomp.NodeTraversal.Callback;
+import com.google.javascript.jscomp.PassFactory.HotSwapPassFactory;
 import com.google.javascript.jscomp.ijs.ConvertToTypedInterface;
 import com.google.javascript.jscomp.lint.CheckDuplicateCase;
 import com.google.javascript.jscomp.lint.CheckEmptyStatements;
@@ -45,6 +46,7 @@ final class JsCheckerPassConfig extends PassConfig.PassConfigDelegate {
   @Override
   protected List<PassFactory> getChecks() {
     return ImmutableList.of(
+        gatherModuleMetadataPass,
         earlyLintChecks,
         scopedAliases,
         closureRewriteClass,
@@ -56,6 +58,22 @@ final class JsCheckerPassConfig extends PassConfig.PassConfigDelegate {
   protected List<PassFactory> getOptimizations() {
     return ImmutableList.of();
   }
+
+  private final HotSwapPassFactory gatherModuleMetadataPass =
+      new HotSwapPassFactory(PassNames.GATHER_MODULE_METADATA) {
+        @Override
+        protected HotSwapCompilerPass create(AbstractCompiler compiler) {
+          return new GatherModuleMetadata(
+              compiler,
+              compiler.getOptions().getProcessCommonJSModules(),
+              compiler.getOptions().getModuleResolutionMode());
+        }
+
+        @Override
+        protected FeatureSet featureSet() {
+          return FeatureSet.latest().withoutTypes();
+        }
+      };
 
   private final PassFactory earlyLintChecks =
       new PassFactory("earlyLintChecks", true) {
@@ -77,7 +95,7 @@ final class JsCheckerPassConfig extends PassConfig.PassConfigDelegate {
                       compiler, CheckMissingAndExtraRequires.Mode.SINGLE_FILE),
                   new CheckUnusedLabels(compiler),
                   new CheckUselessBlocks(compiler),
-                  new ClosureCheckModule(compiler),
+                  new ClosureCheckModule(compiler, compiler.getModuleMetadataMap()),
                   new CheckSetTestOnly(state, compiler),
                   new CheckStrictDeps.FirstPass(state, compiler)));
         }

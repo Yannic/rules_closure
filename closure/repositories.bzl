@@ -348,8 +348,8 @@ def com_google_closure_stylesheets():
         ],
         jar_sha256 = "fef768d4f7cead3c0c0783891118e7d3d6ecf17a3093557891f583d842362e2b",
         deps = [
-            "@args4j",
-            "@com_google_javascript_closure_compiler",
+            "@args4j//jar",
+            "@com_google_closure_compiler//src/com/google/javascript",
             "@com_google_code_gson",
             "@com_google_guava",
             "@com_google_code_findbugs_jsr305",
@@ -622,31 +622,37 @@ def com_google_java_format():
     )
 
 def com_google_javascript_closure_compiler():
-    java_import_external(
-        name = "com_google_javascript_closure_compiler",
-        licenses = ["reciprocal"],  # MPL v1.1 (Rhino AST), Apache 2.0 (JSCompiler)
-        jar_urls = [
-            "https://mirror.bazel.build/repo1.maven.org/maven2/com/google/javascript/closure-compiler-unshaded/v20180805/closure-compiler-unshaded-v20180805.jar",
-            "http://repo1.maven.org/maven2/com/google/javascript/closure-compiler-unshaded/v20180805/closure-compiler-unshaded-v20180805.jar",
+    http_archive(
+        name = "com_google_closure_compiler",
+        urls = [
+            "https://github.com/Yannic/com_google_closure_compiler/archive/bazel.zip",
         ],
-        jar_sha256 = "facf537aad7f643c92771f71bd8d9c9b6830ec2aa56e458d2411678d8dc32368",
-        deps = [
-            "@com_google_code_gson",
-            "@com_google_guava",
-            "@com_google_code_findbugs_jsr305",
-            "@com_google_protobuf//:protobuf_java",
-        ],
-        extra_build_file_content = "\n".join([
-            "java_binary(",
-            "    name = \"main\",",
-            "    main_class = \"com.google.javascript.jscomp.CommandLineRunner\",",
-            "    output_licenses = [\"unencumbered\"],",
-            "    runtime_deps = [",
-            "        \":com_google_javascript_closure_compiler\",",
-            "        \"@args4j\",",
-            "    ],",
-            ")",
-        ]),
+        strip_prefix = "com_google_closure_compiler-bazel",
+    )
+
+    native.maven_jar(
+        name = "jsr305",
+        artifact = "com.google.code.findbugs:jsr305:3.0.1",
+        sha1 = "f7be08ec23c21485b9b5a1cf1654c2ec8c58168d",
+    )
+
+    native.maven_jar(
+        name = "gson",
+        artifact = "com.google.code.gson:gson:jar:2.8.1",
+        sha1 = "02a8e0aa38a2e21cb39e2f5a7d6704cbdc941da0",
+    )
+
+    native.maven_jar(
+        name = "guava",
+        artifact = "com.google.guava:guava:25.1-jre",
+        sha1 = "6c57e4b22b44e89e548b5c9f70f0c45fe10fb0b4",
+    )
+
+        # LICENSE: The Apache Software License, Version 2.0
+    native.maven_jar(
+        name = "error_prone_annotations",
+        artifact = "com.google.errorprone:error_prone_annotations:2.3.1",
+        sha1 = "a6a2b2df72fd13ec466216049b303f206bd66c5d",
     )
 
 def com_google_javascript_closure_library():
@@ -708,7 +714,7 @@ def com_google_template_soy():
         ],
         jar_sha256 = "449664a12ae7f94d6ef72a0271edfe21fe6605fa749b152fce45eccb3e4d09b1",
         deps = [
-            "@args4j",
+            "@args4j//jar",
             "@com_google_code_findbugs_jsr305",
             "@com_google_code_gson",
             "@com_google_common_html_types",

@@ -14,6 +14,13 @@
 
 licenses(["notice"])  # Apache 2.0
 
+java_proto_library(
+    name = "mapping_java_proto",
+    deps = [
+        "@com_google_closure_compiler//src/com/google/debugging/sourcemap/proto:mapping_proto",
+    ],
+)
+
 java_library(
     name = "jscomp",
     srcs = [
@@ -37,13 +44,16 @@ java_library(
         "//javatests/com/google/javascript/jscomp:__pkg__",
     ],
     deps = [
+        ":mapping_java_proto",
         "//java/io/bazel/rules/closure:build_info_java_proto",
         "//java/io/bazel/rules/closure:webpath",
         "//java/io/bazel/rules/closure/worker",
-        "@args4j",
+        "@args4j//jar",
+        "@com_google_closure_compiler//src/com/google/javascript",
+        "@com_google_closure_compiler//src/com/google/javascript:CommandLineRunner",
+        "@com_google_closure_compiler//src/com/google/javascript/rhino",
         "@com_google_dagger",
         "@com_google_guava",
-        "@com_google_javascript_closure_compiler",
         "@com_google_protobuf//:protobuf_java",
     ],
 )
