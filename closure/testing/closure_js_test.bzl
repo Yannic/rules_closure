@@ -33,6 +33,7 @@ def closure_js_test(
         suppress = None,
         visibility = None,
         tags = [],
+        language_out = None,
         **kwargs):
     if not srcs:
         fail("closure_js_test rules can not have an empty 'srcs' list")
@@ -69,6 +70,7 @@ def closure_js_test(
             visibility = visibility,
             testonly = True,
             tags = tags,
+            language = language_out,
         )
 
         phantomjs_test(
